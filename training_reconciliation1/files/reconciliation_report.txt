@@ -1,0 +1,61 @@
+============================================================
+ASSET RECONCILIATION REPORT
+============================================================
+
+SUMMARY COUNTS
+------------------------------------------------------------
+Total rows processed     : 8
+Valid (deployment-ready) : 1
+Invalid rows             : 3
+Duplicate asset_codes    : 1
+Conflicting asset_codes  : 1
+Missing files            : 5
+Orphan files             : 0
+Rows with warnings only  : 1
+
+DUPLICATE / CONFLICTING ASSET CODES
+------------------------------------------------------------
+  - A-002 (CONFLICTING FILENAMES)
+
+MISSING FILES (in manifest, not found in assets/)
+------------------------------------------------------------
+  - ajax.js
+  - banner.png
+  - main.css
+  - students.csv
+  - theme.css
+
+ORPHAN FILES (in assets/, not referenced in manifest)
+------------------------------------------------------------
+  None found.
+
+ROW-LEVEL ERRORS
+------------------------------------------------------------
+  Line 5 (asset_code='BAD3'):
+      ERROR: Invalid asset_code: 'BAD3'
+      ERROR: Invalid owner_email: 'mentor.company.com'
+  Line 8 (asset_code='A-006'):
+      ERROR: day_no 45 out of allowed range [1-40]
+  Line 9 (asset_code='A-007'):
+      ERROR: day_no is not a valid integer: 'abc'
+
+ROW-LEVEL WARNINGS (Day > 30)
+------------------------------------------------------------
+  Line 7 (asset_code='A-005'): day_no 35 references a topic beyond Day 30
+
+ASSETS GROUPED BY DAY -> TYPE
+------------------------------------------------------------
+  Day 18:
+      csv   : A-004
+  Day 24:
+      css   : A-001
+  Day 26:
+      image : A-002, A-002
+  Day 31:
+      js    : BAD3
+  Day 35:
+      video : A-005
+
+============================================================
+END OF REPORT
+============================================================

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Review: {{ csv_filename }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      padding: 24px;
+    }
+
+    .header {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header h1 { font-size: 1.3rem; color: #1a202c; }
+    .header .filename { color: #718096; font-size: 0.9rem; margin-top: 4px; }
+
+    .back-link {
+      text-decoration: none;
+      color: #667eea;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    /* ── Count badges ── */
+    .counts {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: default;
+    }
+
+    .badge-all      { background: #e2e8f0; color: #2d3748; }
+    .badge-valid    { background: #c6f6d5; color: #276749; }
+    .badge-warning  { background: #fefcbf; color: #744210; }
+    .badge-rejected { background: #fed7d7; color: #9b2c2c; }
+
+    /* ── Filter form ── */
+    .filter-bar {
+      background: white;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar label { font-weight: 600; color: #4a5568; }
+
+    .filter-bar select {
+      padding: 8px 12px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #2d3748;
+      background: #f7fafc;
+    }
+
+    .filter-bar button {
+      padding: 8px 18px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .cookie-note {
+      font-size: 0.8rem;
+      color: #a0aec0;
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    thead th {
+      background: #f7fafc;
+      color: #718096;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      padding: 12px 16px;
+      border-bottom: 2px solid #e2e8f0;
+      text-align: left;
+    }
+
+    tbody tr { border-bottom: 1px solid #f0f4f8; }
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody td { padding: 12px 16px; color: #2d3748; vertical-align: top; }
+
+    /* Row colour based on status — set via data attribute */
+    tr[data-status="valid"]    td:first-child { border-left: 3px solid #48bb78; }
+    tr[data-status="warning"]  td:first-child { border-left: 3px solid #ecc94b; }
+    tr[data-status="rejected"] td:first-child { border-left: 3px solid #fc8181; }
+
+    /* Status pill */
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .pill-valid    { background: #c6f6d5; color: #276749; }
+    .pill-warning  { background: #fefcbf; color: #744210; }
+    .pill-rejected { background: #fed7d7; color: #9b2c2c; }
+
+    .reasons-list {
+      list-style: none;
+      margin-top: 4px;
+    }
+
+    .reasons-list li {
+      font-size: 0.78rem;
+      color: #e53e3e;
+      margin-top: 2px;
+    }
+
+    /* ── AJAX validate button ── */
+    .btn-validate {
+      padding: 5px 12px;
+      background: #ebf8ff;
+      color: #2b6cb0;
+      border: 1px solid #bee3f8;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+
+    .btn-validate:hover { background: #bee3f8; }
+
+    /* AJAX result shown below button */
+    .ajax-result {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .ajax-result.valid    { background:#c6f6d5; color:#276749; display:block; }
+    .ajax-result.warning  { background:#fefcbf; color:#744210; display:block; }
+    .ajax-result.rejected { background:#fed7d7; color:#9b2c2c; display:block; }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: #a0aec0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="header">
+  <div>
+    <h1>📋 Asset Review Panel</h1>
+    <div class="filename">File: <strong>{{ csv_filename }}</strong></div>
+  </div>
+  <a href="{% url 'assetreview:upload' %}" class="back-link">← Upload New File</a>
+</div>
+
+<!-- ── COUNT BADGES ── -->
+<div class="counts">
+  <span class="badge badge-all">All: {{ counts.all }}</span>
+  <span class="badge badge-valid">✓ Valid: {{ counts.valid }}</span>
+  <span class="badge badge-warning">⚠ Warning: {{ counts.warning }}</span>
+  <span class="badge badge-rejected">✗ Rejected: {{ counts.rejected }}</span>
+</div>
+
+<!-- ── FILTER FORM ──
+  POST to set_filter_view → saves cookie → redirects back here.
+  The cookie remembers the filter even after page refresh.
+  {% csrf_token %} required for POST.
+-->
+<div class="filter-bar">
+  <form method="POST" action="{% url 'assetreview:set_filter' preview_id %}"
+        style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+    {% csrf_token %}
+    <label for="filter-select">Filter:</label>
+    <select name="filter" id="filter-select">
+      {% for f in valid_filters %}
+        <option value="{{ f }}" {% if f == current_filter %}selected{% endif %}>
+          {{ f|capfirst }}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit">Apply</button>
+  </form>
+  <span class="cookie-note">🍪 Filter saved in cookie: <code>asset_filter={{ current_filter }}</code></span>
+</div>
+
+<!-- ── PREVIEW TABLE ── -->
+<div class="table-wrap">
+  {% if rows %}
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Asset Code</th>
+        <th>Day No</th>
+        <th>Type</th>
+        <th>Filename</th>
+        <th>Status</th>
+        <th>Issues</th>
+        <th>AJAX Check</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr data-status="{{ row.status }}"
+          data-asset-code="{{ row.asset_code }}"
+          data-day-no="{{ row.day_no }}"
+          data-asset-type="{{ row.asset_type }}"
+          data-filename="{{ row.filename }}">
+
+        <td>{{ row.row_number }}</td>
+        <td><code>{{ row.asset_code }}</code></td>
+        <td>{{ row.day_no }}</td>
+        <td>{{ row.asset_type }}</td>
+        <td>{{ row.filename }}</td>
+
+        <!-- Status pill — determined in view, NOT in template logic -->
+        <td>
+          <span class="pill pill-{{ row.status }}">{{ row.status }}</span>
+        </td>
+
+        <!-- Issues from server-side validation -->
+        <td>
+          {% if row.reasons %}
+            <ul class="reasons-list">
+              {% for reason in row.reasons %}
+                <li>• {{ reason }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <span style="color:#a0aec0">—</span>
+          {% endif %}
+        </td>
+
+        <!-- AJAX validate button — JS in preview.js handles this -->
+        <td>
+          <button class="btn-validate" onclick="validateRow(this)">
+            Re-check
+          </button>
+          <div class="ajax-result" id="ajax-result-{{ forloop.counter }}"></div>
+        </td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% else %}
+  <div class="empty-state">
+    <p>No rows match the current filter: <strong>{{ current_filter }}</strong></p>
+  </div>
+  {% endif %}
+</div>
+
+{% comment %} <!--
+  Load our static JS file.
+  {% load static %} and {% static %} are Django template tags for static files.
+--> {% endcomment %}
+{% load static %}
+<script src="{% static 'assetreview/preview.js' %}"></script>
+
+<!--
+  Pass the AJAX URL from Django to JavaScript safely.
+  We use a data attribute on a hidden element instead of
+  hardcoding the URL in the JS file — this way URL names work correctly.
+-->
+<div id="django-data"
+     data-ajax-url="{% url 'assetreview:ajax_validate_row' %}"
+     style="display:none;"></div>
+
+</body>
+</html>

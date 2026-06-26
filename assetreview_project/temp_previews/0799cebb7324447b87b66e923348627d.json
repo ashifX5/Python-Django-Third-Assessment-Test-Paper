@@ -1,0 +1,73 @@
+{
+  "filename": "sample_manifest.csv",
+  "rows": [
+    {
+      "row_number": 2,
+      "asset_code": "A-001",
+      "day_no": "24",
+      "asset_type": "css",
+      "filename": "main.css",
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "row_number": 3,
+      "asset_code": "A-002",
+      "day_no": "26",
+      "asset_type": "image",
+      "filename": "profile.png",
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "row_number": 4,
+      "asset_code": "A-002",
+      "day_no": "26",
+      "asset_type": "image",
+      "filename": "profile_copy.png",
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "row_number": 5,
+      "asset_code": "BAD3",
+      "day_no": "31",
+      "asset_type": "js",
+      "filename": "ajax.js",
+      "status": "rejected",
+      "reasons": [
+        "Invalid asset_code 'BAD3' (must be A-XXX)",
+        "Day 31 exceeds syllabus boundary (Day 30)"
+      ]
+    },
+    {
+      "row_number": 6,
+      "asset_code": "A-004",
+      "day_no": "18",
+      "asset_type": "csv",
+      "filename": "students.csv",
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "row_number": 7,
+      "asset_code": "A-005",
+      "day_no": "5",
+      "asset_type": "video",
+      "filename": "intro.mp4",
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "row_number": 8,
+      "asset_code": "A-006",
+      "day_no": "35",
+      "asset_type": "image",
+      "filename": "banner.png",
+      "status": "warning",
+      "reasons": [
+        "Day 35 exceeds syllabus boundary (Day 30)"
+      ]
+    }
+  ]
+}
